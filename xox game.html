@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XOXO Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #2c3e50;
+            flex-direction: column;
+        }
+        .game {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+        }
+        .box {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #34495e;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .box:hover {
+            background-color: #2980b9;
+        }
+        .box.active {
+            pointer-events: none;
+        }
+        .message {
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="message">XOXO Game - Player X starts</div>
+    <div class="game"></div>
+    
+    <script>
+        const game = document.querySelector('.game');
+        const message = document.querySelector('.message');
+        const boxes = [];
+        let turn = true;
+        let gameEnded = false;
+
+        function createBoxes() {
+            for (let i = 0; i < 9; i++) {
+                const box = document.createElement('div');
+                box.classList.add('box');
+                box.addEventListener('click', boxClickHandler);
+                boxes.push(box);
+                game.appendChild(box);
+            }
+        }
+
+        function boxClickHandler(e) {
+            if (!gameEnded) {
+                if (!e.target.classList.contains('active')) {
+                    e.target.textContent = turn ? 'X' : 'O';
+                    e.target.classList.add('active');
+                    turn = !turn;
+                    message.textContent = `Player ${turn ? 'X' : 'O'}'s Turn`;
+                    checkWinner();
+                }
+            }
+        }
+
+        function checkWinner() {
+            const lines = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6]
+            ];
+
+            for (let line of lines) {
+                const [a, b, c] = line;
+                if (boxes[a].textContent && boxes[a].textContent === boxes[b].textContent && boxes[a].textContent === boxes[c].textContent) {
+                    gameOver(boxes[a].textContent);
+                    return;
+                }
+            }
+
+            if (boxes.every(box => box.textContent !== '')) {
+                gameOver('draw');
+            }
+        }
+
+        function gameOver(winner) {
+            gameEnded = true;
+            if (winner === 'draw') {
+                message.textContent = "It's a draw!";
+            } else {
+                message.textContent = `Game Over! ${winner} Wins!`;
+            }
+            
+            setTimeout(() => {
+                if (confirm("Restart the game?")) {
+                    location.reload();
+                }
+            }, 1000);
+        }
+
+        createBoxes();
+    </script>
+</body>
+</html>
